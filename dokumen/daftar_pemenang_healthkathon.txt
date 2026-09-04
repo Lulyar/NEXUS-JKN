@@ -1,0 +1,92 @@
+========================================================================
+DAFTAR JUARA DAN DESKRIPSI PROJEK HEALTHKATHON BPJS KESEHATAN (2019 - 2025)
+========================================================================
+
+Catatan: Untuk edisi Healthkathon 2026 saat ini masih dalam periode pendaftaran 
+(14 Agustus - 14 September 2026), sehingga daftar pemenang belum tersedia.
+
+------------------------------------------------------------------------
+HEALTHKATHON 2025
+------------------------------------------------------------------------
+* Kategori Artificial Intelligence (AI)
+  - Juara 1: Tim Aivora
+    Projek: AIRA - Chatbot AI Agentic inklusif yang ramah disabilitas, dirancang 
+    khusus untuk mempermudah navigasi JKN bagi pengguna dengan keterbatasan 
+    penglihatan maupun motorik tangan.
+  - Juara 2: Tim Down to Earth
+    Projek: SIGAP-JKN - Platform intelijen generatif berbasis AI untuk menganalisis 
+    anomali jaringan guna mengantisipasi dan menangkal risiko peretasan data JKN.
+  - Juara 3: Tim Rapapa
+    Projek: PRO-CLAIM - Co-Pilot AI pintar yang diprogram untuk mempercepat 
+    validasi klaim fasilitas kesehatan sekaligus mendeteksi potensi anti-fraud.
+
+* Kategori Cyber Security (Capture the Flag & Pentest)
+  - Juara 1: Tim GWS
+  - Juara 2: Tim Middleshots ajah
+  - Juara 3: Tim Aluf
+
+------------------------------------------------------------------------
+HEALTHKATHON 2024
+------------------------------------------------------------------------
+* Kategori Innovation System
+  - Juara 1: Tim Doaibu
+    Projek: Realtime Monitoring Wearable IoT - Sistem layanan diagnosis medis 
+    terintegrasi menggabungkan perangkat pemantauan kesehatan berkala dengan Generative AI.
+  - Juara 2: BU Team
+    Projek: DiagnoSmart AI - Otomatisasi pengelompokan tingkat keparahan penyakit 
+    pasien JKN guna mengefisiensikan rujukan rumah sakit.
+  - Juara 3: Tim Fraudbender
+    Projek: Sistem Pemantauan Klaim Fiktif BPJS - Menyaring rincian biaya pengobatan 
+    mencurigakan dari fasilitas kesehatan secara real-time.
+
+* Kategori Security (Capture the Flag & Pentest)
+  - Juara 1: Tim Urang Banua
+  - Juara 2: Tim GWS
+  - Juara 3: Tim Pentester Negeri Sipil
+
+------------------------------------------------------------------------
+HEALTHKATHON 2023 & 2022
+------------------------------------------------------------------------
+* Kategori Machine Learning & Data Analytics (Edisi 2022/2023)
+  - Juara 1: Tim Paparazzi
+    Projek: Model prediksi berbasis data spasial untuk memetakan wilayah potensial 
+    peningkatan kepesertaan aktif JKN.
+  - Juara 2: Joseph
+    Projek: Purwarupa kalkulator risiko penyakit kronis berskala makro menggunakan 
+    algoritma prediktif linear.
+  - Juara 3: Tim The JamMaths
+    Projek: Analisis statistik visual grafik untuk memprediksi puncak tren pengajuan 
+    klaim penyakit musiman.
+
+* Kategori Innovation System (Edisi 2022)
+  - Juara 1: AYA
+    Projek: Modifikasi ekosistem aplikasi Mobile JKN agar lebih responsif dalam 
+    menangani antrean pelayanan kefarmasian obat.
+  - Juara 3: Tim KLAUS
+    Projek: Integrasi manajemen dokumen rekam medis elektronik terdesentralisasi 
+    yang aman menggunakan teknologi blockchain.
+
+------------------------------------------------------------------------
+VIRTUAL HACKATHON 2021 & 2020 (Era Pandemi)
+------------------------------------------------------------------------
+* Kategori Internet of Things (IoT) 2021
+  - Juara 1: Tim EXIT
+    Projek: Sistem pendaftaran faskes berbasis mesin pemindai nirkabel mandiri 
+    untuk mereduksi antrean fisik di puskesmas.
+  - Juara 2: Tim DeployGaYa
+    Projek: Integrasi alat cek tensi darah portabel langsung dengan basis data 
+    aplikasi Mobile JKN.
+
+* Kategori Artificial Intelligence (AI) 2021
+  - Juara 1: Tim Methodologist
+    Projek: Algoritma otomatis pemilah dokumen rujukan medis JKN menggunakan 
+    pemrosesan bahasa alami (NLP).
+
+------------------------------------------------------------------------
+EDISI PERTAMA: HACKATHON 4.0 (2019)
+------------------------------------------------------------------------
+* Juara Utama & Inovasi Unggulan:
+  - Melahirkan purwarupa sistem E-Claim awal dan pondasi sistem Kalkulator Premi 
+    JKN mandiri yang kini beberapa mekanismenya telah diadopsi ke dalam sistem 
+    internal BPJS Kesehatan untuk simplifikasi pelayanan administrasi JKN-KIS.
+========================================================================
