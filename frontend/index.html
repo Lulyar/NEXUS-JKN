@@ -1,132 +1,22 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="NEXUS-JKN: Sistem Radar Intelijen Deteksi Sindikat Rujukan Semu BPJS Kesehatan">
-    <title>NEXUS-JKN | Radar Intelijen Anti-Kolusi</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.30.4/cytoscape.min.js"></script>
-    <!-- Iconify Web Component -->
-    <script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
-    <link rel="stylesheet" href="/static/css/nexus.css">
-</head>
-<body>
-
-    <!-- ═══════════════ HEADER ═══════════════ -->
-    <header id="main-header">
-        <div class="header-left">
-            <div class="logo-icon">
-                <svg width="34" height="34" viewBox="0 0 32 32" fill="none">
-                    <circle cx="16" cy="16" r="14" stroke="url(#duoGrad)" stroke-width="2.5" fill="none"/>
-                    <circle cx="16" cy="16" r="6" fill="url(#duoGrad)" opacity="0.7"/>
-                    <circle cx="16" cy="8" r="3" fill="#06b6d4"/>
-                    <circle cx="23" cy="20" r="3" fill="#2563eb"/>
-                    <circle cx="9" cy="20" r="3" fill="#2563eb"/>
-                    <line x1="16" y1="8" x2="23" y2="20" stroke="#06b6d4" stroke-width="1.5" opacity="0.6"/>
-                    <line x1="16" y1="8" x2="9" y2="20" stroke="#06b6d4" stroke-width="1.5" opacity="0.6"/>
-                    <line x1="9" y1="20" x2="23" y2="20" stroke="#2563eb" stroke-width="1.5" opacity="0.6"/>
-                    <defs>
-                        <linearGradient id="duoGrad" x1="0" y1="0" x2="32" y2="32">
-                            <stop offset="0%" stop-color="#2563eb"/>
-                            <stop offset="100%" stop-color="#06b6d4"/>
-                        </linearGradient>
-                    </defs>
-                </svg>
-            </div>
-            <div class="header-title">
-                <h1>NEXUS-JKN</h1>
-                <p class="subtitle">Network Explorer &amp; Unusual Syndicate-detector</p>
-            </div>
-        </div>
-    </header>
-
-    <!-- ═══════════════ STATS BAR (2 WARNA: BIRU + CYAN) ═══════════════ -->
-    <section id="stats-bar">
-        <div class="stat-card blue" id="stat-transaksi">
-            <div class="stat-icon-wrapper blue">
-                <iconify-icon icon="lucide:bar-chart-3" class="stat-icon-ic"></iconify-icon>
-            </div>
-            <div class="stat-content">
-                <span class="stat-value" id="val-transaksi">—</span>
-                <span class="stat-label">Total Transaksi</span>
-            </div>
-        </div>
-        <div class="stat-card cyan" id="stat-anomali">
-            <div class="stat-icon-wrapper cyan">
-                <iconify-icon icon="lucide:alert-triangle" class="stat-icon-ic"></iconify-icon>
-            </div>
-            <div class="stat-content">
-                <span class="stat-value" id="val-anomali">—</span>
-                <span class="stat-label">Anomali Terdeteksi</span>
-            </div>
-        </div>
-        <div class="stat-card blue" id="stat-fraud">
-            <div class="stat-icon-wrapper blue">
-                <iconify-icon icon="lucide:shield-alert" class="stat-icon-ic"></iconify-icon>
-            </div>
-            <div class="stat-content">
-                <span class="stat-value" id="val-fraud">—%</span>
-                <span class="stat-label">Fraud Rate</span>
-            </div>
-        </div>
-        <div class="stat-card cyan" id="stat-faskes">
-            <div class="stat-icon-wrapper cyan">
-                <iconify-icon icon="lucide:building-2" class="stat-icon-ic"></iconify-icon>
-            </div>
-            <div class="stat-content">
-                <span class="stat-value" id="val-faskes">—</span>
-                <span class="stat-label">Faskes Terindikasi</span>
-            </div>
-        </div>
-    </section>
-
-    <!-- ═══════════════ MAIN CONTENT ═══════════════ -->
-    <main id="main-content">
-        <!-- Graph Canvas -->
-        <div id="graph-container">
-            <div id="graph-canvas"></div>
-            <div id="graph-legend">
-                <div class="legend-item"><span class="legend-dot fktp"></span>FKTP (Klinik/Puskesmas)</div>
-                <div class="legend-item"><span class="legend-dot fkrtl"></span>FKRTL (Rumah Sakit)</div>
-                <div class="legend-item"><span class="legend-line normal"></span>Rujukan Normal</div>
-                <div class="legend-item"><span class="legend-line fraud"></span>Indikasi Fraud</div>
-            </div>
-            <div id="graph-controls">
-                <button id="btn-fit" title="Fit to screen">
-                    <iconify-icon icon="lucide:maximize-2"></iconify-icon>
-                </button>
-                <button id="btn-zoom-in" title="Zoom In">
-                    <iconify-icon icon="lucide:plus"></iconify-icon>
-                </button>
-                <button id="btn-zoom-out" title="Zoom Out">
-                    <iconify-icon icon="lucide:minus"></iconify-icon>
-                </button>
-            </div>
-        </div>
-
-        <!-- XAI Audit Panel (slide-in from right) -->
-        <aside id="audit-panel" class="hidden">
-            <div class="panel-header">
-                <h2>
-                    <iconify-icon icon="lucide:shield-search" class="panel-header-icon"></iconify-icon>
-                    Panel Audit XAI
-                </h2>
-                <button id="btn-close-panel" title="Tutup Panel">
-                    <iconify-icon icon="lucide:x"></iconify-icon>
-                </button>
-            </div>
-            <div id="audit-content">
-                <!-- Filled dynamically by audit-panel.js -->
-            </div>
-        </aside>
-    </main>
-
-    <!-- ═══════════════ SCRIPTS ═══════════════ -->
-    <script src="/static/js/app.js"></script>
-    <script src="/static/js/graph.js"></script>
-    <script src="/static/js/audit-panel.js"></script>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <meta
+      name="description"
+      content="NEXUS-JKN — Referral Network Intelligence & Early Warning System"
+    />
+    <title>NEXUS-JKN | Referral Network Intelligence</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
 </html>
