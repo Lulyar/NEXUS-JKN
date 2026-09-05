@@ -1,10 +1,10 @@
 export default function AuditConclusion({ score }) {
   const numericScore = Number(score) || 0;
 
-  let title = "Tidak terdapat prioritas tinggi.";
+  let title = "Tidak terdapat prioritas tinggi (Jalur Normal).";
 
   let description =
-    "Pola ini belum menunjukkan kombinasi indikator yang cukup kuat untuk menjadi prioritas pemeriksaan.";
+    "Pola rujukan pada jalur ini berjalan secara alami dan tidak menunjukkan kombinasi indikator yang mencurigakan.";
 
   if (numericScore >= 70) {
     title = "Pola perlu mendapat prioritas pemeriksaan.";
@@ -19,12 +19,12 @@ export default function AuditConclusion({ score }) {
   }
 
   return (
-    <div className="rounded-xl border border-amber-500/20 bg-amber-500/5 p-5">
-      <p className="text-sm font-semibold text-amber-300">{title}</p>
+    <div className="rounded-xl border border-amber-200 bg-amber-50/80 p-5 shadow-sm">
+      <p className="text-sm font-bold text-amber-900">{title}</p>
 
-      <p className="mt-2 text-xs leading-5 text-amber-200/70">{description}</p>
+      <p className="mt-2 text-xs leading-5 text-amber-800">{description}</p>
 
-      <div className="mt-4 border-t border-amber-500/10 pt-4">
+      <div className="mt-4 border-t border-amber-200/80 pt-4">
         <p className="text-[11px] leading-5 text-slate-500">
           NEXUS-JKN digunakan sebagai sistem pendukung keputusan. Hasil analitik
           tidak secara otomatis menyatakan suatu fasilitas melakukan fraud dan

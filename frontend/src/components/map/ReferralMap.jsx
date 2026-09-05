@@ -757,13 +757,13 @@ export default function ReferralMap({
     LEGEND
     ================================================= */}
 
-      <div className="pointer-events-none absolute bottom-4 left-4 z-[500]">
-        <div className="rounded-xl border border-slate-200/80 bg-white/95 p-3 shadow-xl backdrop-blur-sm">
-          <p className="mb-3 text-[10px] font-bold uppercase tracking-widest text-slate-500">
+      <div className="pointer-events-none absolute bottom-3 left-3 z-[500]">
+        <div className="rounded-lg border border-slate-200/80 bg-white/95 p-2 px-2.5 shadow-md backdrop-blur-sm">
+          <p className="mb-1.5 text-[9px] font-bold uppercase tracking-wider text-slate-500">
             Legenda
           </p>
 
-          <div className="space-y-2.5">
+          <div className="space-y-1">
             {/* FKTP */}
             <LegendMarker type="fktp" label="FKTP" />
 
@@ -794,41 +794,41 @@ function LegendMarker({ type, label }) {
 
   if (type === "fktp") {
     className =
-      "flex h-7 w-7 items-center justify-center rounded-full border-2 border-white bg-blue-600 text-[9px] font-bold text-white shadow-md";
+      "flex h-4 w-4 items-center justify-center rounded-full border border-white bg-blue-600 text-[7px] font-bold text-white shadow-sm";
 
     text = "P";
   }
 
   if (type === "fkrtl") {
     className =
-      "flex h-7 w-7 rotate-45 items-center justify-center rounded-[4px] border-2 border-white bg-cyan-600 text-[8px] font-bold text-white shadow-md";
+      "flex h-4 w-4 rotate-45 items-center justify-center rounded-[3px] border border-white bg-emerald-600 text-[6px] font-bold text-white shadow-sm";
 
     text = "RS";
   }
 
   if (type === "priority-fktp") {
     className =
-      "flex h-7 w-7 items-center justify-center rounded-none border-2 border-white bg-red-600 text-[9px] font-bold text-white shadow-md";
+      "flex h-4 w-4 items-center justify-center rounded-none border border-white bg-red-600 text-[7px] font-bold text-white shadow-sm";
 
     text = "P";
   }
 
   if (type === "priority-fkrtl") {
     className =
-      "flex h-7 w-7 items-center justify-center rounded-none border-2 border-white bg-red-600 text-[8px] font-bold text-white shadow-md";
+      "flex h-4 w-4 items-center justify-center rounded-none border border-white bg-red-600 text-[6px] font-bold text-white shadow-sm";
 
     text = "RS";
   }
 
   return (
-    <div className="flex items-center gap-3">
-      <div className="flex h-7 w-7 items-center justify-center">
+    <div className="flex items-center gap-2">
+      <div className="flex h-4 w-4 items-center justify-center">
         <span className={className}>
           <span className={type === "fkrtl" ? "-rotate-45" : ""}>{text}</span>
         </span>
       </div>
 
-      <span className="text-xs text-slate-700">{label}</span>
+      <span className="text-[10px] font-medium text-slate-700">{label}</span>
     </div>
   );
 }
@@ -836,15 +836,17 @@ function LegendMarker({ type, label }) {
 function LegendLine({ type, label }) {
   return (
     <div className="flex items-center gap-2">
-      <span
-        className={
-          type === "priority"
-            ? "block w-8 border-t-[3px] border-red-500"
-            : "block w-8 border-t-2 border-dashed border-slate-500"
-        }
-      />
+      <div className="flex h-4 w-4 items-center justify-center">
+        <span
+          className={
+            type === "priority"
+              ? "block w-4 border-t-[2px] border-red-500"
+              : "block w-4 border-t border-dashed border-slate-500"
+          }
+        />
+      </div>
 
-      <span className="text-xs text-slate-700">{label}</span>
+      <span className="text-[10px] font-medium text-slate-700">{label}</span>
     </div>
   );
 }

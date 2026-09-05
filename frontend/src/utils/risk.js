@@ -1,9 +1,26 @@
 export function getRiskScore(item) {
-  return Number(item?.risk_score ?? item?.fraud_score ?? item?.score ?? 0);
+  if (item === null || item === undefined) return 0;
+
+  let val = 0;
+  if (typeof item === "number") {
+    val = item;
+  } else if (typeof item === "string") {
+    val = parseFloat(item);
+  } else if (typeof item === "object") {
+    val = Number(item.risk_score ?? item.fraud_score ?? item.score ?? 0);
+  }
+
+  if (isNaN(val)) return 0;
+
+  if (val > 0 && val <= 1) {
+    val = val * 100;
+  }
+
+  return val;
 }
 
 export function getRiskLabel(score) {
-  const value = Number(score) || 0;
+  const value = getRiskScore(score);
 
   if (value >= 70) {
     return "SANGAT TINGGI";
@@ -21,19 +38,19 @@ export function getRiskLabel(score) {
 }
 
 export function getRiskClass(score) {
-  const value = Number(score) || 0;
+  const value = getRiskScore(score);
 
   if (value >= 70) {
-    return "text-red-400 bg-red-500/10 border-red-500/20";
+    return "text-red-700 bg-red-50 border-red-200";
   }
 
   if (value >= 55) {
-    return "text-orange-400 bg-orange-500/10 border-orange-500/20";
+    return "text-orange-700 bg-orange-50 border-orange-200";
   }
 
   if (value >= 35) {
-    return "text-amber-400 bg-amber-500/10 border-amber-500/20";
+    return "text-amber-700 bg-amber-50 border-amber-200";
   }
 
-  return "text-emerald-400 bg-emerald-500/10 border-emerald-500/20";
+  return "text-emerald-700 bg-emerald-50 border-emerald-200";
 }

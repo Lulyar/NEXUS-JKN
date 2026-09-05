@@ -5,21 +5,21 @@ function Factor({ label, value, description }) {
     <div className="space-y-2">
       <div className="flex items-center justify-between gap-3">
         <div>
-          <p className="text-xs font-medium text-slate-300">{label}</p>
+          <p className="text-xs font-semibold text-slate-700">{label}</p>
 
           {description && (
-            <p className="text-[11px] text-slate-600">{description}</p>
+            <p className="text-[11px] text-slate-500">{description}</p>
           )}
         </div>
 
-        <span className="text-xs font-bold text-white">
+        <span className="text-xs font-bold text-slate-900">
           {numeric.toFixed(1)}%
         </span>
       </div>
 
-      <div className="h-1.5 overflow-hidden rounded-full bg-slate-800">
+      <div className="h-1.5 overflow-hidden rounded-full bg-slate-100">
         <div
-          className="h-full rounded-full bg-cyan-400"
+          className="h-full rounded-full bg-[#154B90]"
           style={{
             width: `${Math.min(numeric, 100)}%`,
           }}
@@ -31,9 +31,9 @@ function Factor({ label, value, description }) {
 
 export default function XaiFactors({ metrics = {} }) {
   return (
-    <div className="rounded-xl border border-slate-800 bg-slate-950 p-5">
+    <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
       <div className="mb-5">
-        <h3 className="text-sm font-bold text-white">Faktor Penjelas</h3>
+        <h3 className="text-sm font-bold text-slate-900">Faktor Penjelas</h3>
 
         <p className="mt-1 text-xs text-slate-500">
           Faktor yang berkontribusi terhadap nilai risiko.
@@ -43,12 +43,12 @@ export default function XaiFactors({ metrics = {} }) {
       <div className="space-y-5">
         <Factor
           label="Konsentrasi Rujukan"
-          value={metrics.concentration ?? metrics.concentration_ratio ?? 0}
+          value={metrics.concentration ?? metrics.concentration_ratio ?? metrics.concentration_pct ?? 0}
         />
 
         <Factor
           label="Diagnosis Ringan"
-          value={metrics.mild_ratio ?? metrics.diagnosis_light_ratio ?? 0}
+          value={metrics.mild_ratio ?? metrics.diagnosis_light_ratio ?? metrics.mild_diagnosis_pct ?? 0}
         />
 
         <Factor

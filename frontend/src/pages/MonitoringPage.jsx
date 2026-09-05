@@ -10,6 +10,7 @@ import FacilityDetail from "../components/facilities/FacilityDetail";
 import useDashboardData from "../hooks/useDashboardData";
 import useDateFilter from "../hooks/useDateFilter";
 
+import { getRiskScore } from "../utils/risk";
 import { formatNumber } from "../utils/formatNumber";
 
 export default function MonitoringPage({ onFacilityFromMap }) {
@@ -49,7 +50,7 @@ export default function MonitoringPage({ onFacilityFromMap }) {
       return true;
     }
 
-    const score = Number(item.risk_score ?? item.fraud_score ?? 0);
+    const score = getRiskScore(item);
 
     if (riskFilter === "high") {
       return score >= 70;
@@ -89,15 +90,7 @@ export default function MonitoringPage({ onFacilityFromMap }) {
         query={query}
         onQueryChange={setQuery}
         riskFilter={riskFilter}
-        onRiskChange={setRiskFilter}
-        onReset={() => {
-          dateFilter.reset();
-          setQuery("");
-          setRiskFilter("all");
-        }}
-        onOpenDateFilter={dateFilter.open}
-        hasDateFilter={dateFilter.isFiltered}
-        loading={loading}
+        onRiskFilterChange={setRiskFilter}
       />
 
       {/* ==========================================================
