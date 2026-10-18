@@ -67,10 +67,10 @@ export default function Navbar({ activeView, onChange }) {
                   setIsOpen(false);
                 }}
                 className={[
-                  "flex shrink-0 items-center gap-2 border-b-2 px-4 py-3 text-left text-sm font-medium transition md:text-center",
+                  "flex shrink-0 items-center gap-2 border-b-2 px-4 py-3 text-left text-sm font-medium transition-colors duration-200 md:text-center",
                   active
-                    ? "border-blue-400 text-blue-400"
-                    : "border-transparent text-slate-500 hover:text-slate-200",
+                    ? "border-blue-500 text-blue-500"
+                    : "border-transparent text-slate-600 hover:border-blue-300 hover:text-blue-500",
                 ].join(" ")}
               >
                 <Icon className="h-4 w-4" />

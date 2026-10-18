@@ -9,7 +9,7 @@ export default function MonitoringToolbar({
   return (
     <div className="rounded-xl border border-slate-200 bg-white p-3 shadow-sm">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        {/* SEARCH BAR (Full Width) */}
+        {/* SEARCH BAR */}
         <div className="relative min-w-0 flex-1">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
 
@@ -21,19 +21,18 @@ export default function MonitoringToolbar({
           />
         </div>
 
-        {/* RISK FILTER (Right Aligned) */}
+        {/* RISK FILTER */}
         <div className="flex shrink-0 items-center gap-2">
           <Filter className="h-4 w-4 text-slate-400" />
 
           <select
             value={riskFilter}
             onChange={(e) => onRiskFilterChange?.(e.target.value)}
-            className="h-10 rounded-lg border border-slate-200 bg-slate-50 px-3 text-sm text-slate-700 outline-none focus:border-[#154B90] focus:ring-2 focus:ring-[#154B90]/10"
+            className="h-10 rounded-lg border border-slate-200 bg-slate-50 px-3 text-sm text-slate-700 outline-none transition focus:border-[#154B90] focus:ring-2 focus:ring-[#154B90]/10"
           >
             <option value="all">Semua Risiko</option>
-            <option value="high">Risiko Tinggi</option>
-            <option value="medium">Risiko Sedang</option>
-            <option value="low">Risiko Rendah</option>
+            <option value="anomaly">Prioritas Review</option>
+            <option value="normal">Normal</option>
           </select>
         </div>
       </div>
