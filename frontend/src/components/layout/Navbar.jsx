@@ -36,7 +36,7 @@ export default function Navbar({ activeView, onChange }) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <nav className="relative border-b border-slate-800 bg-slate-950">
+    <nav className="relative z-40 border-b border-slate-800 bg-slate-950">
       <div className="mx-auto flex max-w-[1600px] items-center justify-between px-4 md:block md:px-6 lg:px-8">
         <button
           type="button"

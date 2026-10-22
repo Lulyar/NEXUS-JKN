@@ -347,6 +347,12 @@ body,
 .marker-logo {
   letter-spacing: 0.2px;
 }
+/* Batasi seluruh layer Leaflet di dalam stacking context peta */
+.leaflet-container {
+  position: relative;
+  z-index: 0 !important;
+  isolation: isolate;
+}
 
 @media (max-width: 760px) {
   .dashboard-nav {

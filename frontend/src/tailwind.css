@@ -4,3 +4,9 @@
   --font-sans: Inter, Arial, sans-serif;
   --font-mono: "JetBrains Mono", monospace;
 }
+/* Batasi seluruh layer Leaflet di dalam stacking context peta */
+.leaflet-container {
+  position: relative;
+  z-index: 0 !important;
+  isolation: isolate;
+}

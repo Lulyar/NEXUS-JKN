@@ -304,7 +304,7 @@ export default function MonitoringPage({ onFacilityFromMap }) {
           FIX 3: tinggi eksplisit di mobile, `relative` sebagai anchor
           untuk root peta (jika ReferralMap memakai absolute/h-full).
         */}
-        <div className="relative h-[420px] min-h-[420px] w-full shrink-0 sm:h-[520px] sm:min-h-[520px] lg:h-auto lg:min-h-0 lg:flex-1">
+        <div className="relative h-105 min-h-105 w-full shrink-0 sm:h-130 sm:min-h-130 lg:h-auto lg:min-h-0 lg:flex-1">
           <ReferralMap
             graph={visibleGraph}
             anomalies={visibleAnomalies}

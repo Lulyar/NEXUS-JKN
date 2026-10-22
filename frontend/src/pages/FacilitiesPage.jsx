@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { Building2, X } from "lucide-react";
 
@@ -7,6 +7,12 @@ import FacilityDetail from "../components/facilities/FacilityDetail";
 
 import useDashboardData from "../hooks/useDashboardData";
 import { getFacilityRisk } from "../services/facilityService";
+
+const FILTER_OPTIONS = [
+  { value: "ALL", label: "Semua" },
+  { value: "FKTP", label: "FKTP" },
+  { value: "FKRTL", label: "FKRTL" },
+];
 
 function normalizeNode(node) {
   if (node?.data) {
@@ -25,6 +31,18 @@ function getNodeId(node) {
 
 function getNodeName(node) {
   return node?.name ?? node?.label ?? node?.id ?? "Fasilitas";
+}
+
+function getFacilityType(facility) {
+  return String(
+    facility?.type ??
+      facility?.data?.type ??
+      facility?.facility_type ??
+      facility?.category ??
+      "",
+  )
+    .trim()
+    .toUpperCase();
 }
 
 function isSameFacility(first, second) {
@@ -47,6 +65,8 @@ export default function FacilitiesPage({
   facilityFromMap,
   onClearFacilityFromMap,
 }) {
+  const [facilityTypeFilter, setFacilityTypeFilter] = useState("ALL");
+
   const {
     graph,
     anomalies,
@@ -67,6 +87,22 @@ export default function FacilitiesPage({
   }, [graph]);
 
   // ==========================================================
+  // FACILITY COUNTS
+  // ==========================================================
+
+  const facilityCounts = useMemo(() => {
+    return {
+      ALL: facilities.length,
+      FKTP: facilities.filter(
+        (facility) => getFacilityType(facility) === "FKTP",
+      ).length,
+      FKRTL: facilities.filter(
+        (facility) => getFacilityType(facility) === "FKRTL",
+      ).length,
+    };
+  }, [facilities]);
+
+  // ==========================================================
   // SORT BY RISK
   // ==========================================================
 
@@ -75,6 +111,37 @@ export default function FacilitiesPage({
       (a, b) => getFacilityRisk(b, anomalies) - getFacilityRisk(a, anomalies),
     );
   }, [facilities, anomalies]);
+
+  // ==========================================================
+  // FILTER BY FACILITY TYPE
+  // ==========================================================
+
+  const filteredFacilities = useMemo(() => {
+    if (facilityTypeFilter === "ALL") {
+      return sortedFacilities;
+    }
+
+    return sortedFacilities.filter(
+      (facility) => getFacilityType(facility) === facilityTypeFilter,
+    );
+  }, [sortedFacilities, facilityTypeFilter]);
+
+  // ==========================================================
+  // CHANGE FILTER
+  // ==========================================================
+
+  function handleFilterChange(filterValue) {
+    setFacilityTypeFilter(filterValue);
+
+    // Clear the selected facility if it does not match the filter.
+    if (
+      filterValue !== "ALL" &&
+      selectedFacility &&
+      getFacilityType(selectedFacility) !== filterValue
+    ) {
+      setSelectedFacility(null);
+    }
+  }
 
   // ==========================================================
   // SELECT FACILITY FROM MAP
@@ -90,6 +157,13 @@ export default function FacilitiesPage({
     );
 
     if (matchedFacility) {
+      const matchedType = getFacilityType(matchedFacility);
+
+      // Keep the selected facility visible in the filtered list.
+      if (matchedType === "FKTP" || matchedType === "FKRTL") {
+        setFacilityTypeFilter(matchedType);
+      }
+
       setSelectedFacility(matchedFacility);
     }
   }, [facilityFromMap, facilities, setSelectedFacility]);
@@ -142,7 +216,7 @@ export default function FacilitiesPage({
         </div>
       )}
 
-      {/* EMPTY */}
+      {/* EMPTY DATA */}
 
       {!loading && sortedFacilities.length === 0 && (
         <div className="rounded-xl border border-slate-200 bg-white p-10 text-center">
@@ -167,19 +241,100 @@ export default function FacilitiesPage({
           {/* LEFT — FACILITY LIST */}
 
           <section className="min-w-0">
-            <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-              {sortedFacilities.map((facility, index) => (
-                <FacilityCard
-                  key={
-                    getNodeId(facility) || `${getNodeName(facility)}-${index}`
-                  }
-                  facility={facility}
-                  anomalies={anomalies}
-                  selected={isSameFacility(selectedFacility, facility)}
-                  onSelect={setSelectedFacility}
-                />
-              ))}
+            {/* FACILITY TYPE FILTER */}
+
+            <div className="mb-4 rounded-xl border border-[#D9E2EC] bg-white p-4 shadow-sm">
+              <div className="mb-3">
+                <h2 className="text-sm font-bold text-[#17324D]">
+                  Daftar Fasilitas Kesehatan
+                </h2>
+
+                <p className="mt-1 text-xs text-[#60758D]">
+                  Filter berdasarkan jenis fasilitas kesehatan.
+                </p>
+              </div>
+
+              <div
+                role="group"
+                aria-label="Filter jenis fasilitas kesehatan"
+                className="grid grid-cols-3 gap-2"
+              >
+                {FILTER_OPTIONS.map((option) => {
+                  const active = facilityTypeFilter === option.value;
+                  const count = facilityCounts[option.value];
+
+                  return (
+                    <button
+                      key={option.value}
+                      type="button"
+                      aria-pressed={active}
+                      onClick={() => handleFilterChange(option.value)}
+                      className={[
+                        "flex min-w-0 flex-col items-center justify-center",
+                        "rounded-xl border px-2 py-3 text-center",
+                        "transition-all duration-200",
+                        "focus:outline-none focus:ring-2 focus:ring-blue-300/50",
+                        active
+                          ? "border-blue-200 bg-blue-50 text-blue-700 shadow-sm"
+                          : "border-slate-200 bg-white text-slate-600 hover:border-blue-200 hover:bg-slate-50",
+                      ].join(" ")}
+                    >
+                      <span className="text-sm font-semibold">
+                        {option.label}
+                      </span>
+
+                      <span
+                        className={[
+                          "mt-1 text-xs",
+                          active ? "text-blue-600" : "text-slate-400",
+                        ].join(" ")}
+                      >
+                        {count} faskes
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
+
+            {/* FILTERED FACILITY CARDS */}
+
+            {filteredFacilities.length > 0 ? (
+              <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+                {filteredFacilities.map((facility, index) => (
+                  <FacilityCard
+                    key={
+                      getNodeId(facility) || `${getNodeName(facility)}-${index}`
+                    }
+                    facility={facility}
+                    anomalies={anomalies}
+                    selected={isSameFacility(selectedFacility, facility)}
+                    onSelect={setSelectedFacility}
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="rounded-xl border border-slate-200 bg-white p-8 text-center">
+                <Building2 className="mx-auto h-8 w-8 text-slate-300" />
+
+                <p className="mt-3 text-sm font-semibold text-slate-600">
+                  Tidak ada fasilitas{" "}
+                  {facilityTypeFilter === "FKTP" ? "FKTP" : "FKRTL"}.
+                </p>
+
+                <p className="mt-1 text-xs text-slate-400">
+                  Belum ada data untuk jenis fasilitas yang dipilih.
+                </p>
+
+                <button
+                  type="button"
+                  onClick={() => handleFilterChange("ALL")}
+                  className="mt-4 rounded-lg border border-blue-200 px-4 py-2 text-xs font-semibold text-blue-600 transition hover:bg-blue-50"
+                >
+                  Tampilkan semua faskes
+                </button>
+              </div>
+            )}
           </section>
 
           {/* RIGHT — FACILITY DETAIL DESKTOP */}
@@ -211,7 +366,7 @@ export default function FacilitiesPage({
       {/* MOBILE — FACILITY DETAIL MODAL */}
 
       {selectedFacility && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center px-3 py-4 xl:hidden">
+        <div className="fixed inset-0 z-100 flex items-center justify-center px-3 py-4 xl:hidden">
           {/* BACKDROP */}
 
           <button

@@ -757,7 +757,7 @@ export default function ReferralMap({
     LEGEND
     ================================================= */}
 
-      <div className="pointer-events-none absolute bottom-3 left-3 z-[500]">
+      <div className="pointer-events-none absolute bottom-3 left-3 z-500">
         <div className="rounded-lg border border-slate-200/80 bg-white/95 p-2 px-2.5 shadow-md backdrop-blur-sm">
           <p className="mb-1.5 text-[9px] font-bold uppercase tracking-wider text-slate-500">
             Legenda
@@ -840,7 +840,7 @@ function LegendLine({ type, label }) {
         <span
           className={
             type === "priority"
-              ? "block w-4 border-t-[2px] border-red-500"
+              ? "block w-4 border-t-2 border-red-500"
               : "block w-4 border-t border-dashed border-slate-500"
           }
         />

@@ -41,7 +41,7 @@ export default function StatCard({
     <div
       className={[
         "rounded-xl border bg-white p-4 shadow-sm transition",
-        "hover:-translate-y-[1px] hover:shadow-md",
+        "hover:-translate-y-1px hover:shadow-md",
         theme.border,
       ].join(" ")}
     >
