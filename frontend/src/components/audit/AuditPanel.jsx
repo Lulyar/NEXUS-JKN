@@ -185,6 +185,18 @@ export default function AuditPanel({
                 </div>
               )}
 
+              {anomaly?.ml_probability !== undefined && (
+                <div className="flex items-center justify-between rounded-xl border border-blue-200 bg-blue-50/70 px-4 py-2.5 text-xs">
+                  <div className="flex items-center gap-2">
+                    <span className="h-2 w-2 rounded-full bg-blue-600 animate-pulse"></span>
+                    <span className="font-semibold text-blue-950">Engine: XGBoost Supervised ML</span>
+                  </div>
+                  <span className="font-mono font-bold text-blue-700">
+                    Confidence: {(anomaly.ml_probability * 100).toFixed(1)}%
+                  </span>
+                </div>
+              )}
+
               <RiskScore score={score} />
 
               <XaiFactors metrics={metrics} />

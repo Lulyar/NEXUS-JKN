@@ -26,7 +26,7 @@ export default function AuditConclusion({ score }) {
 
       <div className="mt-4 border-t border-amber-200/80 pt-4">
         <p className="text-[11px] leading-5 text-slate-500">
-          NEXUS-JKN digunakan sebagai sistem pendukung keputusan. Hasil analitik
+          AEGIS-JKN digunakan sebagai sistem pendukung keputusan. Hasil analitik
           tidak secara otomatis menyatakan suatu fasilitas melakukan fraud dan
           tetap memerlukan verifikasi auditor.
         </p>

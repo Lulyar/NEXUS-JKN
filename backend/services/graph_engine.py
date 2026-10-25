@@ -2,20 +2,6 @@ import networkx as nx
 import pandas as pd
 
 
-# Known FKTP list (clinics/puskesmas)
-FKTP_LIST = [
-    "Klinik Pratama Sehat Sejahtera",
-    "Puskesmas Melati",
-    "Puskesmas Mawar",
-    "Klinik Pratama Kasih Ibu",
-    "Puskesmas Harapan Bangsa",
-    "Klinik Pratama Medika Utama",
-    "Puskesmas Sukamaju",
-    "Klinik Pratama Sehat Bersama",
-    "Puskesmas Cempaka",
-    "Klinik Pratama Nusantara",
-]
-
 MILD_ICD10 = {"J00", "A09"}  # Diagnoses considered "mild" / should be handled at FKTP
 
 

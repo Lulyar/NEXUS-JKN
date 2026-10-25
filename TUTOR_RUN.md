@@ -1,107 +1,83 @@
-# 🛰️ NEXUS-JKN — Panduan Cara Menjalankan Project di Laptop
+# 🛡️ AEGIS-JKN — Panduan Menjalankan Project
 
-Dokumen ini berisi panduan langkah demi langkah untuk menjalankan aplikasi **NEXUS-JKN** (Network Explorer & Unusual Syndicate-detector) di laptop kamu.
+Dokumen ini berisi panduan langkah demi langkah untuk menjalankan aplikasi **AEGIS-JKN** (*Anomaly & Ethical Graph Insight System* — *"Perisai Cerdas Penjaga Integritas Rujukan Faskes"*) di laptop kamu.
 
 ---
 
 ## 📋 Prasyarat (*Prerequisites*)
 
-Pastikan laptop kamu sudah terinstall **Python** (versi 3.9 ke atas).
-> 💡 *Untuk pengguna Windows, perintah Python bisa menggunakan `py` atau `python`.*
+1. **Python** (versi 3.9 ke atas, gunakan perintah `py` atau `python`).
+2. **Node.js** (versi 18 ke atas, untuk frontend React & Vite).
 
 ---
 
-## 🚀 Langkah-Langkah Menjalankan Project
+## 🚀 Langkah Menjalankan Project (Buka 2 Terminal)
 
-### 1. Buka Terminal / Command Prompt
-Buka **Command Prompt (CMD)** atau **PowerShell**, lalu masuk ke folder project `healthkathon`:
-```powershell
-cd d:\healthkathon
-```
-*(Sesuaikan `d:\healthkathon` dengan lokasi folder project di laptop kamu)*
+Aplikasi ini menggunakan arsitektur modern yang terdiri dari **Backend (FastAPI)** dan **Frontend (React + Vite)**.
 
----
+### 🖥️ Terminal 1 — Menjalankan Backend (FastAPI)
 
-### 2. Install Dependensi / Library Python
-Jalankan perintah berikut di terminal untuk menginstall semua library yang dibutuhkan (FastAPI, Uvicorn, Pandas, NetworkX):
-
-**Untuk Windows:**
-```powershell
-py -m pip install -r backend/requirements.txt
-```
-
-**Atau (jika menggunakan `python` biasa):**
-```bash
-python -m pip install -r backend/requirements.txt
-```
+1. Buka PowerShell / Command Prompt:
+   ```powershell
+   cd d:\healthkathon
+   ```
+2. *(Opsional jika pertama kali)* Install dependensi Python:
+   ```powershell
+   py -m pip install -r backend/requirements.txt
+   ```
+3. Jalankan server backend:
+   ```powershell
+   py backend/main.py
+   ```
+   *Server backend akan aktif di: `http://localhost:8000`*
 
 ---
 
-### 3. Jalankan Server Backend
-Setelah install selesai, jalankan server aplikasi dengan perintah:
+### 🌐 Terminal 2 — Menjalankan Frontend (React + Vite)
 
-**Untuk Windows:**
-```powershell
-py backend/main.py
-```
-
-**Atau:**
-```bash
-python backend/main.py
-```
-
-Jika berhasil, akan muncul pesan di terminal seperti ini:
-```text
-[NEXUS-JKN] Server Starting...
-[NEXUS-JKN] Frontend path: ...\frontend
-[NEXUS-JKN] Open browser at: http://localhost:8000
-
-INFO:     Started server process
-INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
-```
+1. Buka terminal/PowerShell baru:
+   ```powershell
+   cd d:\healthkathon\frontend
+   ```
+2. *(Opsional jika pertama kali)* Install modul node:
+   ```powershell
+   npm install
+   ```
+3. Jalankan server frontend:
+   ```powershell
+   npm run dev
+   ```
+   *Server frontend akan aktif di: `http://localhost:5173`*
 
 ---
 
-### 4. Buka di Browser
-Buka browser (Chrome, Edge, Firefox, atau Safari) dan akses link berikut:
+### 🎯 3. Buka di Browser
 
-👉 **[http://localhost:8000](http://localhost:8000)**
+Buka browser pilihanmu dan akses:
+👉 **[http://localhost:5173](http://localhost:5173)**
+
+*(Vite sudah otomatis mem-proxy request data `/api` dan WebSocket `/ws` ke backend port 8000).*
 
 ---
 
-## 🎯 Fitur Utama Yang Bisa Dicoba
+## 🛠️ Fitur Utama Yang Bisa Dicoba
 
-1. **Peta Jaringan Rujukan (Cytoscape Graph)**:
-   - **Node Lingkaran Biru**: Klinik / Puskesmas (FKTP).
-   - **Node Hexagon Cyan**: Rumah Sakit (FKRTL).
-   - **Garis Merah Berkedip & Node Hexagon Merah**: Indikasi kolusi / rujukan semu bermasalah.
+1. **Peta Jaringan Rujukan (Leaflet GIS & Network Graph)**:
+   - Visualisasi alur rujukan dari FKTP (Puskesmas/Klinik) ke FKRTL (Rumah Sakit).
+   - Jalur dengan garis merah menandai indikasi rujukan semu / kolusi rujukan abnormal.
 2. **Panel Audit XAI (Explainable AI)**:
-   - Klik pada **Garis Merah Berkedip** (antara Klinik Pratama Sehat Sejahtera → RS Mitra Mulia) untuk membuka **Panel Audit XAI** di sisi kanan.
-   - Panel akan membedah bukti numerik: skor fraud, persentase konsentrasi rujukan, rasio diagnosa ringan (ISPA J00), rata-rata jarak, serta sampel log transaksi.
-3. **Tombol Tindakan Audit**:
-   - Coba klik tombol **"Tandai untuk Audit"** atau **"Cetak Bukti PDF"** di panel kanan untuk melihat respons notifikasi melayang (*Toast Notification*).
+   - Klik pada jalur bermasalah untuk memunculkan bukti numerik, faktor pemicu risiko, serta sampel data transaksi rujukan.
+3. **Filter Periode Analisis**:
+   - Filter tanggal rujukan historis untuk memantau lonjakan transaksi pada rentang waktu tertentu.
+4. **Simulasi Transaksi Real-time**:
+   - Streaming data rujukan via WebSocket interaktif dengan kendali Play, Pause, dan Speed Control.
 
 ---
 
-## 🧪 Menguji Auto-Update Data Baru (Input CSV)
+## ❓ Pemecahan Masalah (*Troubleshooting*)
 
-Aplikasi ini memiliki fitur **Auto-Detect File Modification**:
-1. Buka file CSV dataset di `data/dataset_rujukan_nexus.csv`.
-2. Coba ubah atau tambah data rujukan baru.
-3. Simpan file CSV, lalu tekan **Refresh (F5)** di browser `http://localhost:8000`.
-4. Sistem backend akan otomatis menghitung ulang grafik dan mendeteksi anomali baru tanpa perlu restart server!
+* **Port 8000 bentrok (`Address already in use`):**
+  * Pastikan terminal Python sebelumnya sudah ditutup (Ctrl + C), atau hentikan proses Python dari Task Manager.
+* **Perintah `py` tidak dikenali:**
+  * Gunakan `python backend/main.py`. Pastikan Python sudah dicentang *"Add to PATH"* saat instalasi.
 
----
-
-## ❓ Pertanyaan & Pemecahan Masalah (*Troubleshooting*)
-
-* **Error: `[Errno 10048] error while attempting to bind on address`**
-  * **Penyebab:** Port `8000` sudah dipakai oleh aplikasi lain atau server NEXUS-JKN sebelumnya masih berjalan.
-  * **Solusi:** Tutup terminal yang sedang berjalan sebelumnya, atau buka Task Manager dan akhiri proses Python, lalu jalankan `py backend/main.py` kembali.
-
-* **Perintah `py` atau `python` tidak dikenali?**
-  * **Solusi:** Pastikan Python sudah terinstall dan centang centang opsi **"Add Python to PATH"** saat install Python.
-
----
-
- Selamat mencoba **NEXUS-JKN**! Jika ada pertanyaan, hubungi tim pengembang. 🚀

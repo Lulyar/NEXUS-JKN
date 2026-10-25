@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import { getDashboardData } from "../services/dashboardService";
 
-const REALTIME_INTERVAL = 5000;
+const REALTIME_INTERVAL = 30000;
 
 export default function useDashboardData() {
   const [stats, setStats] = useState(null);
@@ -75,7 +75,7 @@ export default function useDashboardData() {
 
         setLastUpdated(new Date());
       } catch (err) {
-        console.error("NEXUS-JKN LOAD ERROR:", err);
+        console.error("AEGIS-JKN LOAD ERROR:", err);
 
         if (currentRequest === requestId.current) {
           setError(err.message || "Gagal mengambil data dashboard.");

@@ -5,18 +5,16 @@ export default function Header() {
         {/* Brand */}
         <div className="flex min-w-0 items-center gap-3">
           <div className="flex h-10 w-10 shrink-0 items-center justify-center">
-            <img src="/logo.png" alt="NEXUS-JKN Logo" className="h-full w-full object-contain" />
+            <img src="/logo.png" alt="AEGIS-JKN Logo" className="h-full w-full object-contain" />
           </div>
 
           <div className="min-w-0">
-            <div className="flex items-center gap-2">
-              <h1 className="truncate text-base font-bold tracking-wide text-white sm:text-lg">
-                NEXUS-JKN
-              </h1>
-            </div>
+            <h1 className="truncate text-base font-bold tracking-wide text-white sm:text-lg">
+              AEGIS-JKN
+            </h1>
 
-            <p className="hidden text-xs font-medium text-slate-500 sm:block">
-              Network Explorer & Unusual Syndicate Detector
+            <p className="hidden text-xs font-medium text-slate-400 sm:block">
+              Anomaly &amp; Ethical Graph Insight System
             </p>
           </div>
         </div>

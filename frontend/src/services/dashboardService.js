@@ -83,6 +83,16 @@ function getFallbackCoordinates(type, index) {
       [-6.12, 106.76],
       [-6.2, 106.75],
       [-6.28, 106.85],
+      [-6.155, 106.77],
+      [-6.225, 106.87],
+      [-6.185, 106.73],
+      [-6.24, 106.89],
+      [-6.13, 106.81],
+      [-6.265, 106.76],
+      [-6.17, 106.89],
+      [-6.29, 106.81],
+      [-6.11, 106.79],
+      [-6.235, 106.72],
     ],
     FKRTL: [
       [-6.2, 106.82],
@@ -90,8 +100,14 @@ function getFallbackCoordinates(type, index) {
       [-6.23, 106.84],
       [-6.16, 106.79],
       [-6.27, 106.8],
+      [-6.15, 106.86],
+      [-6.25, 106.77],
+      [-6.19, 106.8],
+      [-6.22, 106.88],
+      [-6.14, 106.78],
     ],
   };
 
-  return coordinates[type]?.[index] || coordinates.FKTP[0];
+  const list = coordinates[type] || coordinates.FKTP;
+  return list[index % list.length];
 }

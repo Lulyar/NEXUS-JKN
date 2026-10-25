@@ -226,7 +226,7 @@ export default function ReferralMap({
 
     const edges = rawEdges.map(normalizeEdge);
 
-    console.log("NEXUS-JKN GRAPH:", {
+    console.log("AEGIS-JKN GRAPH:", {
       nodes: nodes.length,
       edges: edges.length,
       anomalies: anomalies.length,
@@ -406,7 +406,7 @@ export default function ReferralMap({
       }
     });
 
-    console.log("NEXUS-JKN EDGES:", {
+    console.log("AEGIS-JKN EDGES:", {
       normal: normalEdges.length,
       priority: priorityEdges.length,
     });
@@ -731,7 +731,7 @@ export default function ReferralMap({
      */
 
     if (edges.length === 0) {
-      console.warn("NEXUS-JKN: graph.edges kosong.", graph);
+      console.warn("AEGIS-JKN: graph.edges kosong.", graph);
     }
 
     if (
@@ -740,7 +740,7 @@ export default function ReferralMap({
       priorityEdges.length === 0
     ) {
       console.warn(
-        "NEXUS-JKN: edges ada tetapi tidak ada edge yang berhasil digambar.",
+        "AEGIS-JKN: edges ada tetapi tidak ada edge yang berhasil digambar.",
         {
           edges,
           nodeIds: [...nodeMap.keys()],

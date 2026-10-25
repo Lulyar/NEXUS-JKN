@@ -15,7 +15,10 @@ from services.data_loader import load_dataset, get_summary_stats
 from services.graph_engine import build_referral_graph, graph_to_cytoscape
 from services.anomaly_detector import detect_anomalies
 
-app = FastAPI(title="NEXUS-JKN", description="Network Explorer & Unusual Syndicate-detector")
+app = FastAPI(
+    title="AEGIS-JKN",
+    description="Anomaly & Ethical Graph Insight System — Perisai Cerdas Penjaga Integritas Rujukan Faskes"
+)
 
 app.add_middleware(
     CORSMiddleware,
@@ -26,12 +29,30 @@ app.add_middleware(
 
 # Serve frontend static files
 FRONTEND_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "frontend")
+DIST_DIR = os.path.join(FRONTEND_DIR, "dist")
+
+if os.path.exists(os.path.join(DIST_DIR, "assets")):
+    app.mount("/assets", StaticFiles(directory=os.path.join(DIST_DIR, "assets")), name="assets")
 app.mount("/static", StaticFiles(directory=FRONTEND_DIR), name="static")
 
 
-def _get_analysis():
-    """Load data, build graph, detect anomalies — with caching via data_loader."""
-    df = load_dataset()
+_analysis_cache = None
+_analysis_mtime = None
+
+
+def _get_analysis(force_reload=False):
+    """Load data, build graph, detect anomalies — with global in-memory caching."""
+    global _analysis_cache, _analysis_mtime
+
+    csv_path = os.path.normpath(
+        os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'data', 'dataset_rujukan_nexus.csv')
+    )
+    current_mtime = os.path.getmtime(csv_path) if os.path.exists(csv_path) else None
+
+    if not force_reload and _analysis_cache is not None and _analysis_mtime == current_mtime:
+        return _analysis_cache
+
+    df = load_dataset(force_reload=force_reload)
     G = build_referral_graph(df)
     anomalies, anomaly_edges = detect_anomalies(G)
     graph_data = graph_to_cytoscape(G, anomaly_edges)
@@ -43,13 +64,26 @@ def _get_analysis():
     stats["faskes_terindikasi"] = len(
         set(a['source'] for a in anomalies) | set(a['target'] for a in anomalies)
     )
-    return df, G, anomalies, anomaly_edges, graph_data, stats
+
+    _analysis_cache = (df, G, anomalies, anomaly_edges, graph_data, stats)
+    _analysis_mtime = current_mtime
+    return _analysis_cache
+
+
+@app.on_event("startup")
+async def startup_event():
+    """Pre-warm cache and preload ML model so all API requests respond in < 1ms."""
+    print("[AEGIS-JKN] Pre-warming cache and loading ML model...")
+    _get_analysis()
+    print("[AEGIS-JKN] Cache warmed successfully! Ready for instant requests.")
 
 
 # ────────────────────────── ROUTES ──────────────────────────
 
 @app.get("/")
 async def serve_index():
+    if os.path.exists(os.path.join(DIST_DIR, "index.html")):
+        return FileResponse(os.path.join(DIST_DIR, "index.html"))
     return FileResponse(os.path.join(FRONTEND_DIR, "index.html"))
 
 
@@ -248,7 +282,7 @@ async def live_stream(ws: WebSocket):
 
 if __name__ == "__main__":
     import uvicorn
-    print("\n[NEXUS-JKN] Server Starting...")
-    print(f"[NEXUS-JKN] Frontend path: {FRONTEND_DIR}")
-    print(f"[NEXUS-JKN] Open browser at: http://localhost:8000\n")
+    print("\n[AEGIS-JKN] Server Starting...")
+    print(f"[AEGIS-JKN] Frontend path: {FRONTEND_DIR}")
+    print(f"[AEGIS-JKN] Open browser at: http://localhost:8000\n")
     uvicorn.run(app, host="0.0.0.0", port=8000)
