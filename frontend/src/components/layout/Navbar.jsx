@@ -6,6 +6,7 @@ import {
   Building2,
   ClipboardCheck,
   Menu,
+  Sparkles,
   X,
 } from "lucide-react";
 
@@ -19,6 +20,11 @@ const menus = [
     id: "priority",
     label: "Prioritas Audit",
     icon: ClipboardCheck,
+  },
+  {
+    id: "recommendation",
+    label: "Rekomendasi RS (AI)",
+    icon: Sparkles,
   },
   {
     id: "facilities",

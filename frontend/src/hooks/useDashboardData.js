@@ -15,7 +15,7 @@ export default function useDashboardData() {
   const [anomalies, setAnomalies] = useState([]);
 
   const [query, setQuery] = useState("");
-  const [riskFilter, setRiskFilter] = useState("all");
+  const [riskFilter, setRiskFilter] = useState("anomaly");
 
   const [selectedFacility, setSelectedFacility] = useState(null);
 

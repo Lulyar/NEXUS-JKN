@@ -1,0 +1,212 @@
+import json
+
+nb_path = 'AEGIS_JKN_Training_Pipeline.ipynb'
+with open(nb_path, 'r', encoding='utf-8') as f:
+    nb = json.load(f)
+
+# Check if section 8 already exists
+has_sec_8 = any('Model 3' in ''.join(c.get('source', [])) for c in nb['cells'])
+if not has_sec_8:
+    cell_md8 = {
+        'cell_type': 'markdown',
+        'metadata': {},
+        'source': [
+            '## 8. 🏥 Model 3: AI Smart Hospital Recommender Engine (XGBoost Recommender)\n',
+            '*Sesuai revisi dewan juri/coach: Sistem rekomendasi rujukan cerdas berbasis jenjang faskes BPJS (Tipe A, B, C, D), tingkat keparahan klinis diagnosa ICD-10, estimasi jarak dan waktu tempuh jalan raya, serta rekam jejak anti-fraud.*\n\n',
+            'Model ini memprediksi probabilitas kesesuaian fasilitas rujukan tujuan agar:\n',
+            '1. Pasien kasus ringan (non-spesialistik) dialirkan ke RS Tipe D / Tipe C (mencegah penumpukan di RS Tipe A).\n',
+            '2. Pasien kasus darurat/berat langsung dialirkan ke RS Tipe A / B dengan fasilitas ICU & subspesialis lengkap.\n',
+            '3. Menghindari rute faskes yang terindikasi memiliki sindikasi rujukan / anomali tinggi.'
+        ]
+    }
+    
+    cell_code8 = {
+        'cell_type': 'code',
+        'execution_count': None,
+        'metadata': {},
+        'outputs': [],
+        'source': [
+            '# ==========================================\n',
+            '# 8. TRAINING ML HOSPITAL RECOMMENDER ENGINE\n',
+            '# ==========================================\n',
+            'print("🚀 Memulai Training Model 3: Hospital Recommender Engine...")\n\n',
+            'SEVERITY_MAP = {\n',
+            '    "J00": 1,  # ISPA (Ringan)\n',
+            '    "A09": 1,  # Diare (Ringan)\n',
+            '    "K29": 1,  # Gastritis (Ringan)\n',
+            '    "E11": 2,  # Diabetes (Sedang / Kronis)\n',
+            '    "I10": 2,  # Hipertensi (Sedang / Kronis)\n',
+            '    "I21": 3,  # Infark Miokard Akut (Berat / Gawat Darurat)\n',
+            '    "N18": 3,  # Gagal Ginjal Kronis (Berat)\n',
+            '    "I63": 3,  # Stroke Iskemik (Berat)\n',
+            '}\n\n',
+            'TIER_SCORE_MAP = {\n',
+            '    "Tipe A": 4,\n',
+            '    "Tipe B": 3,\n',
+            '    "Tipe C": 2,\n',
+            '    "Tipe D": 1,\n',
+            '}\n\n',
+            '# Rute anomali hasil deteksi jejaring graf\n',
+            'audited_anomaly_routes = set([\n',
+            '    ("Klinik Pratama Sehat Sejahtera", "RS Mitra Mulia"),\n',
+            '    ("Klinik Pratama Medika Utama", "RS Sentosa"),\n',
+            '    ("Puskesmas Sukamaju", "RS Medika Care"),\n',
+            '    ("Klinik Pratama Surya Medika", "RS Graha Sehat"),\n',
+            '    ("Puskesmas Anggrek", "RS Permata Bunda"),\n',
+            '    ("Puskesmas Harapan Bangsa", "RS Bhakti Husada"),\n',
+            '    ("Klinik Pratama Kasih Ibu", "RS Ananda Medika"),\n',
+            '    ("Puskesmas Melati", "RS Harapan Kita Bersama"),\n',
+            '    ("Klinik Pratama Nusantara", "RSUD Berkah Mandiri"),\n',
+            '    ("Puskesmas Kenanga", "RS Mitra Mulia"),\n',
+            '    ("Klinik Pratama Sehat Bersama", "RS Sentosa"),\n',
+            '    ("Puskesmas Mawar", "RS Medika Care"),\n',
+            '    ("Klinik Pratama Sejahtera Abadi", "RS Bhakti Husada"),\n',
+            '    ("Puskesmas Flamboyan", "RS Graha Sehat"),\n',
+            '    ("Puskesmas Cempaka", "RS Permata Bunda"),\n',
+            '])\n\n',
+            'sample_rec = df.sample(n=min(15000, len(df)), random_state=42)\n',
+            'rec_training_rows = []\n\n',
+            'for _, row in sample_rec.iterrows():\n',
+            '    f_asal = row["faskes_asal"]\n',
+            '    f_tujuan = row["faskes_tujuan"]\n',
+            '    icd = row["kode_icd10"]\n',
+            '    tier = row["tingkat_faskes_tujuan"]\n',
+            '    dist = float(row["jarak_km"])\n',
+            '    real_dist = round(dist * 1.25, 1)\n',
+            '    travel_time = max(5, int(round((real_dist / 28.0) * 60)))\n\n',
+            '    sev = SEVERITY_MAP.get(icd, 1)\n',
+            '    tier_val = TIER_SCORE_MAP.get(tier, 2)\n',
+            '    is_mild = 1 if sev == 1 else 0\n',
+            '    is_emergency = 1 if sev == 3 else 0\n',
+            '    is_collusion = 1 if (f_asal, f_tujuan) in audited_anomaly_routes else 0\n\n',
+            '    if is_mild:\n',
+            '        ideal_tier = tier in ["Tipe D", "Tipe C"]\n',
+            '    elif is_emergency:\n',
+            '        ideal_tier = tier in ["Tipe A", "Tipe B"]\n',
+            '    else:\n',
+            '        ideal_tier = tier in ["Tipe C", "Tipe B", "Tipe D"]\n\n',
+            '    is_suitable = 1 if (ideal_tier and not is_collusion and travel_time <= 45) else 0\n\n',
+            '    rec_training_rows.append({\n',
+            '        "severity_score": sev,\n',
+            '        "is_mild_icd": is_mild,\n',
+            '        "is_emergency": is_emergency,\n',
+            '        "real_distance_km": real_dist,\n',
+            '        "travel_time_minutes": travel_time,\n',
+            '        "tipe_rs_score": tier_val,\n',
+            '        "is_collusion_risk": is_collusion,\n',
+            '        "is_suitable_label": is_suitable,\n',
+            '    })\n\n',
+            'rec_df = pd.DataFrame(rec_training_rows)\n',
+            'rec_feature_cols = [\n',
+            '    "severity_score",\n',
+            '    "is_mild_icd",\n',
+            '    "is_emergency",\n',
+            '    "real_distance_km",\n',
+            '    "travel_time_minutes",\n',
+            '    "tipe_rs_score",\n',
+            '    "is_collusion_risk",\n',
+            ']\n\n',
+            'X_rec = rec_df[rec_feature_cols]\n',
+            'y_rec = rec_df["is_suitable_label"]\n\n',
+            'X_tr, X_te, y_tr, y_te = train_test_split(\n',
+            '    X_rec, y_rec, test_size=0.2, random_state=42, stratify=y_rec\n',
+            ')\n\n',
+            'xgb_rec = xgb.XGBClassifier(\n',
+            '    n_estimators=250,\n',
+            '    max_depth=4,\n',
+            '    learning_rate=0.05,\n',
+            '    subsample=0.85,\n',
+            '    colsample_bytree=0.85,\n',
+            '    eval_metric="logloss",\n',
+            '    random_state=42,\n',
+            ')\n\n',
+            'xgb_rec.fit(X_tr, y_tr)\n\n',
+            '# Evaluasi\n',
+            'y_rec_pred = xgb_rec.predict(X_te)\n',
+            'y_rec_proba = xgb_rec.predict_proba(X_te)[:, 1]\n',
+            'acc_rec = accuracy_score(y_te, y_rec_pred)\n',
+            'auc_rec = roc_auc_score(y_te, y_rec_proba)\n\n',
+            'print(f"✅ Training Sukses! Akurasi: {acc_rec * 100:.2f}% | AUC-ROC: {auc_rec:.4f}")\n',
+            'print("\\nClassification Report:")\n',
+            'print(classification_report(y_te, y_rec_pred, target_names=["Kurang Sesuai", "Direkomendasikan"]))\n\n',
+            '# Simpan bundle model recommender\n',
+            'rec_bundle = {\n',
+            '    "model": xgb_rec,\n',
+            '    "feature_columns": rec_feature_cols,\n',
+            '    "severity_map": SEVERITY_MAP,\n',
+            '    "tier_map": TIER_SCORE_MAP,\n',
+            '    "metrics": {"accuracy": float(acc_rec), "auc_roc": float(auc_rec)},\n',
+            '    "version": "1.0-healthkathon"\n',
+            '}\n',
+            'joblib.dump(rec_bundle, "backend/models/aegis_jkn_recommender.joblib")\n',
+            'joblib.dump(rec_bundle, "aegis_jkn_recommender.joblib")\n',
+            'print("Model Recommender tersimpan di: backend/models/aegis_jkn_recommender.joblib")\n'
+        ]
+    }
+
+    cell_md9 = {
+        'cell_type': 'markdown',
+        'metadata': {},
+        'source': [
+            '## 9. 🎯 Simulasi Inferensi Rekomendasi RS Cerdas\n',
+            '*Menguji model ML secara langsung untuk 2 skenario klinis:* \n',
+            '1. **Pasien Kasus Ringan (ISPA / J00)**: Puskesmas Teratai → Harus merekomendasikan RS Tipe D / C.\n',
+            '2. **Pasien Kasus Kritis (Infark Miokard / I21)**: Puskesmas Teratai → Harus merekomendasikan RS Tipe A / B.'
+        ]
+    }
+
+    cell_code9 = {
+        'cell_type': 'code',
+        'execution_count': None,
+        'metadata': {},
+        'outputs': [],
+        'source': [
+            'sample_candidates = [\n',
+            '    {"nama": "RS Bhakti Husada", "tipe": "Tipe D", "jarak_km": 8.0, "waktu_menit": 17, "kolusi": 0},\n',
+            '    {"nama": "RS Sentosa", "tipe": "Tipe C", "jarak_km": 10.5, "waktu_menit": 22, "kolusi": 0},\n',
+            '    {"nama": "RS Mitra Mulia", "tipe": "Tipe B", "jarak_km": 14.0, "waktu_menit": 30, "kolusi": 0},\n',
+            '    {"nama": "RSUD Berkah Mandiri", "tipe": "Tipe A", "jarak_km": 16.5, "waktu_menit": 35, "kolusi": 0},\n',
+            ']\n\n',
+            'print("=" * 70)\n',
+            'print("Skenario 1: Diagnosa J00 (ISPA / Batuk Pilek - Kasus Ringan)")\n',
+            'print("=" * 70)\n',
+            'for c in sample_candidates:\n',
+            '    row = pd.DataFrame([{\n',
+            '        "severity_score": 1,\n',
+            '        "is_mild_icd": 1,\n',
+            '        "is_emergency": 0,\n',
+            '        "real_distance_km": c["jarak_km"],\n',
+            '        "travel_time_minutes": c["waktu_menit"],\n',
+            '        "tipe_rs_score": TIER_SCORE_MAP[c["tipe"]],\n',
+            '        "is_collusion_risk": c["kolusi"],\n',
+            '    }])[rec_feature_cols]\n',
+            '    prob = xgb_rec.predict_proba(row)[0, 1] * 100\n',
+            '    status = "⭐ DIREKOMENDASIKAN" if prob >= 70 else "❌ TIDAK DIREKOMENDASIKAN"\n',
+            '    print(f"[{c[\'tipe\']}] {c[\'nama\']:22s} -> Kecocokan ML: {prob:5.1f}% | {status}")\n\n',
+            'print("\\n" + "=" * 70)\n',
+            'print("Skenario 2: Diagnosa I21 (Serangan Jantung Akut - Kasus Gawat Darurat)")\n',
+            'print("=" * 70)\n',
+            'for c in sample_candidates:\n',
+            '    row = pd.DataFrame([{\n',
+            '        "severity_score": 3,\n',
+            '        "is_mild_icd": 0,\n',
+            '        "is_emergency": 1,\n',
+            '        "real_distance_km": c["jarak_km"],\n',
+            '        "travel_time_minutes": c["waktu_menit"],\n',
+            '        "tipe_rs_score": TIER_SCORE_MAP[c["tipe"]],\n',
+            '        "is_collusion_risk": c["kolusi"],\n',
+            '    }])[rec_feature_cols]\n',
+            '    prob = xgb_rec.predict_proba(row)[0, 1] * 100\n',
+            '    status = "⭐ DIREKOMENDASIKAN" if prob >= 70 else "❌ TIDAK DIREKOMENDASIKAN"\n',
+            '    print(f"[{c[\'tipe\']}] {c[\'nama\']:22s} -> Kecocokan ML: {prob:5.1f}% | {status}")\n'
+        ]
+    }
+
+    nb['cells'].extend([cell_md8, cell_code8, cell_md9, cell_code9])
+
+    with open(nb_path, 'w', encoding='utf-8') as f:
+        json.dump(nb, f, indent=1, ensure_ascii=False)
+    print('Notebook updated with Section 8 and Section 9 successfully!')
+else:
+    print('Section 8 already exists in notebook.')
+

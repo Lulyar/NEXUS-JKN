@@ -33,11 +33,11 @@ def generate_nexus_jkn_dataset(num_rows=40000, output_file="data/dataset_rujukan
         "RSUD Kota Sehat": "Tipe A",
         "RS Medika Care": "Tipe B",
         "RS Sentosa": "Tipe C",
-        "RS Bhakti Husada": "Tipe C",
+        "RS Bhakti Husada": "Tipe D",
         "RS Graha Sehat": "Tipe B",
         "RS Permata Bunda": "Tipe C",
         "RSUD Berkah Mandiri": "Tipe A",
-        "RS Ananda Medika": "Tipe C",
+        "RS Ananda Medika": "Tipe D",
         "RS Harapan Kita Bersama": "Tipe B"
     }
     faskes_tujuan_names = list(faskes_tujuan_dict.keys())

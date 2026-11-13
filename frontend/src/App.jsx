@@ -8,6 +8,7 @@ import MonitoringPage from "./pages/MonitoringPage";
 import PriorityPage from "./pages/PriorityPage";
 import FacilitiesPage from "./pages/FacilitiesPage";
 import AnalyticsPage from "./pages/AnalyticsPage";
+import RecommendationPage from "./pages/RecommendationPage";
 
 export default function App() {
   const [activeView, setActiveView] = useState("monitoring");
@@ -60,6 +61,8 @@ export default function App() {
         )}
 
         {activeView === "priority" && <PriorityPage />}
+
+        {activeView === "recommendation" && <RecommendationPage />}
 
         {activeView === "facilities" && (
           <FacilitiesPage

@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import RiskScore from "./RiskScore";
 import XaiFactors from "./XaiFactors";
 import AuditConclusion from "./AuditConclusion";
+import TravelTimeComparison from "./TravelTimeComparison";
 
 import { getAuditData } from "../../services/auditService";
 
@@ -198,6 +199,8 @@ export default function AuditPanel({
               )}
 
               <RiskScore score={score} />
+
+              <TravelTimeComparison edgeMetrics={data?.edge_metrics} narrative={data?.narrative} />
 
               <XaiFactors metrics={metrics} />
 

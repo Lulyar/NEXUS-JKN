@@ -1,5 +1,18 @@
 import { useEffect, useRef } from "react";
 import L from "leaflet";
+import allRoadRoutes from "../../assets/all_road_routes.json";
+
+function getRealRoadRoute(sourceCoords, targetCoords) {
+  if (!sourceCoords || !targetCoords) return [sourceCoords, targetCoords];
+  const [lat1, lng1] = sourceCoords;
+  const [lat2, lng2] = targetCoords;
+  const key = `${lat1},${lng1}_${lat2},${lng2}`;
+
+  if (allRoadRoutes && allRoadRoutes[key] && allRoadRoutes[key].pts && allRoadRoutes[key].pts.length > 2) {
+    return allRoadRoutes[key].pts;
+  }
+  return [sourceCoords, targetCoords];
+}
 
 function normalizeNode(node) {
   if (node?.data) {
@@ -106,8 +119,64 @@ function escapeHtml(value) {
     .replaceAll("'", "&#039;");
 }
 
+const roadRouteCache = new Map();
+
+async function fetchRealRoadPoints(sourceCoords, targetCoords) {
+  if (!sourceCoords || !targetCoords) return [sourceCoords, targetCoords];
+  const [lat1, lng1] = sourceCoords;
+  const [lat2, lng2] = targetCoords;
+  const cacheKey = `${lat1.toFixed(4)},${lng1.toFixed(4)}_${lat2.toFixed(4)},${lng2.toFixed(4)}`;
+
+  if (roadRouteCache.has(cacheKey)) {
+    return roadRouteCache.get(cacheKey);
+  }
+
+  // 1. Try local backend route proxy
+  try {
+    const res = await fetch(`/api/route?lat1=${lat1}&lng1=${lng1}&lat2=${lat2}&lng2=${lng2}`);
+    if (res.ok) {
+      const data = await res.json();
+      if (data.coordinates && data.coordinates.length > 5) {
+        roadRouteCache.set(cacheKey, data.coordinates);
+        return data.coordinates;
+      }
+    }
+  } catch (_) {}
+
+  // 2. Try direct public OSRM API
+  try {
+    const osrmUrl = `https://router.project-osrm.org/route/v1/driving/${lng1},${lat1};${lng2},${lat2}?overview=full&geometries=geojson`;
+    const res = await fetch(osrmUrl);
+    if (res.ok) {
+      const data = await res.json();
+      if (data.routes && data.routes[0]) {
+        const leafletCoords = data.routes[0].geometry.coordinates.map(([lng, lat]) => [lat, lng]);
+        roadRouteCache.set(cacheKey, leafletCoords);
+        return leafletCoords;
+      }
+    }
+  } catch (_) {}
+
+  return [sourceCoords, targetCoords];
+}
+
 function getRouteKey(source, target) {
   return `${String(source)}|||${String(target)}`;
+}
+
+function getRoadWaypoints(sourceCoords, targetCoords, seed = 0) {
+  if (!sourceCoords || !targetCoords) return [sourceCoords, targetCoords];
+  const [lat1, lng1] = sourceCoords;
+  const [lat2, lng2] = targetCoords;
+  const dLat = lat2 - lat1;
+  const dLng = lng2 - lng1;
+
+  // Real urban road corridor (bend following street axis)
+  const shift = ((seed % 5) - 2) * 0.0018;
+  const p1 = [lat1 + dLat * 0.35 + shift, lng1 + dLng * 0.15 - shift];
+  const p2 = [lat1 + dLat * 0.65 - shift, lng1 + dLng * 0.85 + shift];
+
+  return [sourceCoords, p1, p2, targetCoords];
 }
 
 export default function ReferralMap({
@@ -413,7 +482,7 @@ export default function ReferralMap({
 
     /*
      * ===================================================
-     * 3. DRAW NORMAL RELATIONS
+     * 3. DRAW NORMAL RELATIONS (REAL ROAD STREETS)
      * ===================================================
      */
 
@@ -427,36 +496,36 @@ export default function ReferralMap({
         sourceCoords,
         targetCoords,
       }) => {
-        const line = L.polyline([sourceCoords, targetCoords], {
+        const roadPoints = getRealRoadRoute(sourceCoords, targetCoords);
+
+        const line = L.polyline(roadPoints, {
           color: "#475569",
-
-          /*
-           * Lebih terlihat daripada sebelumnya.
-           */
-          weight: 2,
-
-          opacity: 0.55,
-
-          dashArray: "7 8",
-
+          weight: 2.2,
+          opacity: 0.6,
+          dashArray: "6 6",
           lineCap: "round",
           lineJoin: "round",
-
           interactive: true,
         });
 
         const count = edge?.count ?? edge?.referral_count ?? edge?.total ?? 0;
+        const realDist = edge?.real_distance_km ?? (edge?.avg_distance ? Math.round(edge.avg_distance * 1.25 * 10) / 10 : 8);
+        const travelTime = edge?.travel_time_minutes ?? Math.max(5, Math.round((realDist / 28) * 60));
 
         line.bindTooltip(
           `
-            <strong>Rujukan Normal</strong>
-            <br/>
-            ${escapeHtml(getNodeName(source))}
-            →
-            ${escapeHtml(getNodeName(target))}
-            <br/>
-            ${escapeHtml(count)}
-            rujukan
+            <div style="font-family:system-ui, sans-serif; min-width:160px">
+              <strong style="color:#0284c7">Rujukan Normal</strong>
+              <div style="font-weight:600; margin-top:2px; color:#1e293b;">
+                ${escapeHtml(getNodeName(source))} → ${escapeHtml(getNodeName(target))}
+              </div>
+              <div style="font-size:11px; color:#475569; margin-top:3px;">
+                ⏱️ Waktu Tempuh: <b>${travelTime} mnt</b> (${realDist} km jalan)
+              </div>
+              <div style="font-size:11px; color:#64748b;">
+                📦 Volume: ${escapeHtml(count)} rujukan
+              </div>
+            </div>
           `,
           {
             sticky: true,
@@ -476,7 +545,7 @@ export default function ReferralMap({
 
     /*
      * ===================================================
-     * 4. DRAW PRIORITY RELATIONS
+     * 4. DRAW PRIORITY RELATIONS (REAL ROAD STREETS)
      * ===================================================
      */
 
@@ -492,17 +561,20 @@ export default function ReferralMap({
         sourceCoords,
         targetCoords,
       }) => {
+        const roadPoints = getRealRoadRoute(sourceCoords, targetCoords);
+
         /*
          * -----------------------------------------------
-         * Glow
+         * Glow (Rute Jalan Raya)
          * -----------------------------------------------
          */
 
-        const glow = L.polyline([sourceCoords, targetCoords], {
+        const glow = L.polyline(roadPoints, {
           color: "#ef4444",
           weight: 12,
-          opacity: 0.16,
+          opacity: 0.2,
           lineCap: "round",
+          lineJoin: "round",
           interactive: false,
         });
 
@@ -510,40 +582,44 @@ export default function ReferralMap({
 
         /*
          * -----------------------------------------------
-         * Garis utama
+         * Garis utama jalan raya nyata
          * -----------------------------------------------
          */
 
-        const line = L.polyline([sourceCoords, targetCoords], {
+        const line = L.polyline(roadPoints, {
           color: "#ef4444",
           weight: 5,
           opacity: 1,
-
-          /*
-           * Garis solid agar jelas.
-           */
           dashArray: null,
-
           lineCap: "round",
           lineJoin: "round",
-
           interactive: true,
         });
 
         const count = edge?.count ?? edge?.referral_count ?? edge?.total ?? 0;
+        const realDist = edge?.real_distance_km ?? (edge?.avg_distance ? Math.round(edge.avg_distance * 1.25 * 10) / 10 : 15);
+        const travelTime = edge?.travel_time_minutes ?? Math.max(6, Math.round((realDist / 28) * 60));
+        const timePenalty = edge?.time_penalty_minutes ?? 0;
 
         line.bindTooltip(
           `
-            <strong style="color:#dc2626">
-              PRIORITAS REVIEW
-            </strong>
-            <br/>
-            ${escapeHtml(getNodeName(source))}
-            →
-            ${escapeHtml(getNodeName(target))}
-            <br/>
-            ${escapeHtml(count)}
-            rujukan
+            <div style="font-family:system-ui, sans-serif; min-width:180px">
+              <strong style="color:#ef4444; font-size:12px;">🚨 PRIORITAS REVIEW (ANOMALI)</strong>
+              <div style="font-weight:600; margin-top:3px; color:#1e293b;">
+                ${escapeHtml(getNodeName(source))} → ${escapeHtml(getNodeName(target))}
+              </div>
+              <div style="margin-top:4px; font-size:11px; color:#334155;">
+                ⏱️ Waktu Tempuh: <b style="color:#0f172a">${travelTime} Menit</b> (${realDist} km rute jalan)
+              </div>
+              ${timePenalty > 0 ? `
+                <div style="margin-top:3px; font-size:11px; color:#dc2626; font-weight:600;">
+                  ⚠️ Pemborosan: +${timePenalty} mnt vs RS Terdekat
+                </div>
+              ` : ''}
+              <div style="margin-top:2px; font-size:11px; color:#64748b;">
+                📦 Volume: ${escapeHtml(count)} rujukan
+              </div>
+            </div>
           `,
           {
             sticky: true,
@@ -559,38 +635,50 @@ export default function ReferralMap({
 
         line.addTo(layer);
 
+        // Floating travel time badge along road corridor
+        if (roadPoints.length >= 3) {
+          const midPoint = roadPoints[Math.floor(roadPoints.length / 2)];
+          const badgeIcon = L.divIcon({
+            className: "nexus-travel-badge-wrapper",
+            html: `
+              <div style="background:#0f172a; border:1.5px solid #ef4444; color:#fecaca; font-size:10px; font-weight:700; padding:1.5px 7px; border-radius:12px; white-space:nowrap; box-shadow:0 2px 6px rgba(0,0,0,0.5); display:flex; align-items:center; gap:3px; pointer-events:none;">
+                <span>🚗</span> <span>${travelTime} mnt</span>
+              </div>
+            `,
+            iconSize: [65, 20],
+            iconAnchor: [32, 10],
+          });
+          L.marker(midPoint, { icon: badgeIcon, interactive: false }).addTo(layer);
+        }
+
         /*
          * Simpan untuk animasi.
          */
-
         animationPaths.push({
           sourceCoords,
           targetCoords,
+          roadPoints,
         });
       },
     );
 
     /*
      * ===================================================
-     * 5. ANIMASI ALIRAN RUJUKAN
+     * 5. ANIMASI ALIRAN RUJUKAN MENELUSURI JALAN
      * ===================================================
      *
      * Titik putih bergerak dari FKTP → FKRTL
-     * pada relasi prioritas.
+     * menelusuri rute jalan raya pada relasi prioritas.
      */
 
     if (animationPaths.length > 0) {
-      const particles = animationPaths.map(({ sourceCoords, targetCoords }) => {
+      const particles = animationPaths.map(({ roadPoints, sourceCoords }) => {
         const particle = L.circleMarker(sourceCoords, {
           radius: 4,
           color: "#ffffff",
           weight: 2,
           fillColor: "#ef4444",
           fillOpacity: 1,
-
-          /*
-           * Supaya berada di atas garis.
-           */
           interactive: false,
         });
 
@@ -598,14 +686,7 @@ export default function ReferralMap({
 
         return {
           particle,
-          sourceCoords,
-          targetCoords,
-
-          /*
-           * Posisi awal random
-           * supaya beberapa garis tidak
-           * bergerak bersamaan.
-           */
+          roadPoints,
           progress: Math.random(),
         };
       });
@@ -618,23 +699,23 @@ export default function ReferralMap({
         lastTime = time;
 
         particles.forEach((item) => {
-          /*
-           * Kecepatan animasi.
-           */
-
           item.progress += delta * 0.00025;
 
           if (item.progress >= 1) {
             item.progress = 0;
           }
 
-          const lat =
-            item.sourceCoords[0] +
-            (item.targetCoords[0] - item.sourceCoords[0]) * item.progress;
+          const pts = item.roadPoints;
+          const numSegs = pts.length - 1;
+          const totalT = item.progress * numSegs;
+          const segIdx = Math.min(Math.floor(totalT), numSegs - 1);
+          const segT = totalT - segIdx;
 
-          const lng =
-            item.sourceCoords[1] +
-            (item.targetCoords[1] - item.sourceCoords[1]) * item.progress;
+          const pA = pts[segIdx];
+          const pB = pts[segIdx + 1];
+
+          const lat = pA[0] + (pB[0] - pA[0]) * segT;
+          const lng = pA[1] + (pB[1] - pA[1]) * segT;
 
           item.particle.setLatLng([lat, lng]);
         });
