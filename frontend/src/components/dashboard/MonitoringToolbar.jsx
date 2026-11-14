@@ -28,11 +28,20 @@ export default function MonitoringToolbar({
           <select
             value={riskFilter}
             onChange={(e) => onRiskFilterChange?.(e.target.value)}
-            className="h-10 rounded-lg border border-slate-200 bg-slate-50 px-3 text-sm font-medium text-slate-700 outline-none transition focus:border-[#154B90] focus:ring-2 focus:ring-[#154B90]/10"
+            className="
+    h-11 w-full min-w-[240px] sm:w-[260px]
+    rounded-lg border border-slate-200
+    bg-white px-4
+    text-sm font-medium text-slate-700
+    outline-none transition
+    hover:border-slate-300
+    focus:border-[#154B90]
+    focus:ring-2 focus:ring-[#154B90]/10
+  "
           >
-            <option value="anomaly">🚨 Hanya Rute Anomali (Kritis)</option>
-            <option value="all">🌐 Semua Alur Rujukan</option>
-            <option value="normal">🟢 Hanya Rute Normal</option>
+            <option value="anomaly">Rute Berisiko</option>
+            <option value="all">Semua Rute</option>
+            <option value="normal">Rute Normal</option>
           </select>
         </div>
       </div>

@@ -80,20 +80,23 @@ export default function PriorityPage() {
 
   return (
     <div className="space-y-5">
-      {/* HEADER */}
-      <div>
-        <p className="text-[10px] font-bold uppercase tracking-widest text-cyan-500">
-          Prioritas Audit
-        </p>
+      {/* PAGE HEADER - SAMA DENGAN REKOMENDASI */}
+      <section className="flex flex-col items-center px-4 pb-2 pt-3 text-center">
+        <div className="mb-3 inline-flex items-center rounded-full border border-blue-100 bg-blue-50 px-3 py-1.5">
+          <span className="text-[11px] font-semibold uppercase tracking-wider text-blue-700">
+            PRIORITAS AUDIT
+          </span>
+        </div>
 
-        <h2 className="mt-1 text-xl font-bold text-[#17324D]">
+        <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
           Pola Rujukan yang Perlu Ditinjau
-        </h2>
+        </h1>
 
-        <p className="mt-1 text-sm text-[#64748B]">
-          Daftar diprioritaskan berdasarkan nilai risiko analitik.
+        <p className="mt-2 max-w-2xl text-sm leading-relaxed text-slate-500">
+          Daftar pola rujukan yang diprioritaskan berdasarkan nilai risiko
+          analitik.
         </p>
-      </div>
+      </section>
 
       {/* ERROR */}
       {error && (
@@ -107,6 +110,7 @@ export default function PriorityPage() {
       {loading && sortedAnomalies.length === 0 && (
         <div className="rounded-xl border border-slate-200 bg-white p-8 text-center">
           <div className="mx-auto h-7 w-7 animate-spin rounded-full border-2 border-slate-200 border-t-cyan-500" />
+
           <p className="mt-3 text-sm text-slate-500">
             Memuat daftar prioritas audit...
           </p>
@@ -117,9 +121,11 @@ export default function PriorityPage() {
       {!loading && !error && sortedAnomalies.length === 0 && (
         <div className="rounded-xl border border-slate-200 bg-white px-5 py-12 text-center">
           <ClipboardCheck size={34} className="mx-auto text-slate-300" />
+
           <h3 className="mt-3 font-semibold text-slate-700">
             Belum ada prioritas audit
           </h3>
+
           <p className="mt-1 text-sm text-slate-500">
             Belum ditemukan pola rujukan untuk ditampilkan.
           </p>
@@ -127,7 +133,7 @@ export default function PriorityPage() {
       )}
 
       {/* AUDIT LIST */}
-      <div className="space-y-3">
+      <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
         {sortedAnomalies.map((anomaly, index) => {
           const source = getSource(anomaly);
           const target = getTarget(anomaly);
@@ -145,61 +151,69 @@ export default function PriorityPage() {
               onClick={() => handleSelectAudit(anomaly)}
               disabled={!source || !target}
               aria-pressed={isSelected}
-              className={`w-full rounded-2xl border bg-white p-4 text-left transition hover:border-cyan-300 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-cyan-500/30 disabled:cursor-not-allowed disabled:opacity-60 sm:p-5 ${
-                isSelected
-                  ? "border-cyan-400 ring-2 ring-cyan-100"
-                  : "border-[#D9E3F0]"
-              }`}
+              className={`
+                flex min-w-0 flex-col justify-between
+                rounded-xl border bg-white p-4 text-left
+                transition duration-200
+                hover:border-cyan-300 hover:shadow-sm
+                focus:outline-none focus:ring-2
+                focus:ring-cyan-500/30
+                disabled:cursor-not-allowed disabled:opacity-60
+                sm:p-5
+                ${
+                  isSelected
+                    ? "border-cyan-400 ring-2 ring-cyan-100"
+                    : "border-[#D9E3F0]"
+                }
+              `}
             >
-              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                <div className="min-w-0 flex-1">
-                  {/* RANK AND SCORE */}
-                  <div className="mb-3 flex flex-wrap items-center gap-2">
-                    <span className="text-sm font-semibold text-slate-600">
-                      #{index + 1}
-                    </span>
+              {/* RANK AND SCORE */}
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="text-sm font-semibold text-slate-600">
+                  #{index + 1}
+                </span>
 
-                    <span
-                      className={`rounded-lg border px-2.5 py-1 text-xs font-bold ${getRiskStyle(
-                        score,
-                      )}`}
-                    >
-                      {score.toFixed(2)}/100
-                    </span>
-                  </div>
-
-                  {/* REFERRAL ROUTE */}
-                  <div className="flex flex-wrap items-center gap-2 text-sm font-medium text-[#17324D] sm:text-base">
-                    <span className="break-words">
-                      {source || "Sumber tidak tersedia"}
-                    </span>
-
-                    <ChevronRight
-                      size={18}
-                      className="shrink-0 text-cyan-500"
-                    />
-
-                    <span className="break-words">
-                      {target || "Tujuan tidak tersedia"}
-                    </span>
-                  </div>
-
-                  {/* REFERRAL COUNT */}
-                  <p className="mt-2 text-sm text-[#64748B]">
-                    {formatNumber(count)} transaksi rujukan
-                  </p>
-                </div>
-
-                {/* STATUS */}
-                <div className="flex shrink-0 items-center gap-2 text-sm text-amber-500">
-                  <AlertTriangle size={17} />
-                  <span>Perlu pemeriksaan</span>
-                </div>
+                <span
+                  className={`rounded-lg border px-2.5 py-1 text-xs font-bold ${getRiskStyle(
+                    score,
+                  )}`}
+                >
+                  {score.toFixed(2)}/100
+                </span>
               </div>
 
-              <div className="mt-3 flex items-center justify-end gap-1 text-xs font-semibold text-cyan-600">
-                {isSelected ? "Detail dipilih" : "Klik untuk melihat detail"}
-                <ChevronRight size={14} />
+              {/* REFERRAL ROUTE */}
+              <div className="mt-4 min-w-0">
+                <div className="flex min-w-0 flex-wrap items-center gap-2 text-sm font-medium leading-relaxed text-[#17324D] sm:text-base">
+                  <span className="break-words">
+                    {source || "Sumber tidak tersedia"}
+                  </span>
+
+                  <ChevronRight size={17} className="shrink-0 text-cyan-500" />
+
+                  <span className="break-words">
+                    {target || "Tujuan tidak tersedia"}
+                  </span>
+                </div>
+
+                {/* REFERRAL COUNT */}
+                <p className="mt-2 text-sm text-[#64748B]">
+                  {formatNumber(count)} transaksi rujukan
+                </p>
+              </div>
+
+              {/* STATUS AND DETAIL */}
+              <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 pt-3">
+                <div className="flex items-center gap-2 text-xs text-amber-500 sm:text-sm">
+                  <AlertTriangle size={16} className="shrink-0" />
+                  <span>Perlu pemeriksaan</span>
+                </div>
+
+                <div className="flex items-center gap-1 text-xs font-semibold text-cyan-600">
+                  {isSelected ? "Detail dipilih" : "Lihat detail"}
+
+                  <ChevronRight size={14} />
+                </div>
               </div>
             </button>
           );
@@ -209,7 +223,7 @@ export default function PriorityPage() {
       {/* AUDIT DETAIL */}
       {selectedAudit && (
         <section
-          className="scroll-mt-4 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"
+          className="scroll-mt-4 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm"
           aria-label="Detail audit"
         >
           <div className="flex items-center justify-between gap-3 border-b border-slate-100 px-4 py-3 sm:px-5">
@@ -217,6 +231,7 @@ export default function PriorityPage() {
               <p className="text-[10px] font-bold uppercase tracking-widest text-cyan-500">
                 Detail Audit
               </p>
+
               <h3 className="mt-1 text-base font-bold text-[#17324D]">
                 Pemeriksaan Pola Rujukan
               </h3>
