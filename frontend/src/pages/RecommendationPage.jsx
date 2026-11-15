@@ -566,7 +566,7 @@ export default function RecommendationPage() {
                         </p>
 
                         <p className="text-xs font-semibold text-slate-700">
-                          {rs.rank_badge}
+                          {String(rs.rank_badge || "").replace(/[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F600}-\u{1F64F}]/gu, "").trim()}
                         </p>
                       </div>
                     </div>
@@ -644,7 +644,10 @@ export default function RecommendationPage() {
 
                     <ul className="mt-3 space-y-2">
                       {(rs.reasons || []).map((reason, rIdx) => {
-                        const warning = reason.includes("⚠️");
+                        const cleanReason = String(reason || "")
+                          .replace(/[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F600}-\u{1F64F}]/gu, "")
+                          .trim();
+                        const warning = cleanReason.toLowerCase().includes("peringatan");
 
                         return (
                           <li
@@ -663,7 +666,7 @@ export default function RecommendationPage() {
                               />
                             )}
 
-                            <span>{reason}</span>
+                            <span>{cleanReason}</span>
                           </li>
                         );
                       })}

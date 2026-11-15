@@ -223,10 +223,10 @@ def recommend_hospitals(faskes_asal, kode_icd10, anomaly_edges=None, df=None):
         # 3. Integrity & Anti-Fraud Score (0 - 20 pts)
         if is_collusion_risk:
             integrity_score = 0.0
-            integrity_reason = "⚠️ PERINGATAN: Memiliki pola rujukan terkonsentrasi/anomali tinggi"
+            integrity_reason = "Peringatan: Memiliki pola rujukan terkonsentrasi / anomali tinggi"
         else:
             integrity_score = 20.0
-            integrity_reason = "✅ Bersih dari indikasi sindikasi rujukan / audit aman"
+            integrity_reason = "Bersih dari indikasi sindikasi rujukan / audit aman"
 
         total_score = min(99.0, max(20.0, tier_score + time_score + integrity_score))
         match_percentage = round(total_score, 1)
@@ -279,7 +279,7 @@ def recommend_hospitals(faskes_asal, kode_icd10, anomaly_edges=None, df=None):
                 # Combined ML probability and clinical scoring
                 c_score = round(ml_pct * 0.75 + (candidates[idx]["match_score"] * 0.25), 1)
                 candidates[idx]["match_score"] = max(15.0, min(98.8, c_score))
-                candidates[idx]["reasons"].insert(0, f"🤖 Prediksi XGBoost ML: {ml_pct}% kecocokan klinis")
+                candidates[idx]["reasons"].insert(0, f"Prediksi XGBoost ML: {ml_pct}% kecocokan klinis")
         except Exception:
             pass
 
@@ -289,13 +289,13 @@ def recommend_hospitals(faskes_asal, kode_icd10, anomaly_edges=None, df=None):
     # Assign Badges for Top 3
     for idx, c in enumerate(candidates):
         if idx == 0:
-            c["rank_badge"] = "🥇 Rekomendasi Utama (Paling Ideal)"
+            c["rank_badge"] = "Rekomendasi Utama (Paling Ideal)"
             c["badge_color"] = "emerald"
         elif idx == 1:
-            c["rank_badge"] = "🥈 Alternatif Sekunder"
+            c["rank_badge"] = "Alternatif Sekunder"
             c["badge_color"] = "blue"
         elif idx == 2:
-            c["rank_badge"] = "🥉 Alternatif Tersier"
+            c["rank_badge"] = "Alternatif Tersier"
             c["badge_color"] = "indigo"
         else:
             c["rank_badge"] = f"Pilihan #{idx + 1}"
